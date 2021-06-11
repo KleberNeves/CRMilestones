@@ -23,11 +23,11 @@ Intro text, motivation, context, links to references.
 This package uses CRExplorer, which is free and available from ... . Credits, link to references, manual
 
 First of all, you should install it. If you haven't, run the code below and follow the instructions:
-```{r}
+```{r, eval=FALSE}
 install_CRE()
 ```
 
-Once installed, you'll need to tell the functions where to find it:
+Once installed, you'll need to tell the functions where to find it (alternatively, add it to your .RProfile)
 ```{r}
 CREXPLORER_PATH = "..."
 ```
@@ -38,7 +38,7 @@ CR_data = run_CRE(data_path = "...", cre_path = CREXPLORER_PATH,
                   other_args_to_pass_to_CRExplorer)
 ```
 
-It returns the CSV, read, as a data frame and the list of references, already disambiguated, as a data frame (optionally, it should save the files in CSV or WOS)
+It returns the graph CSV, as a data frame and the list of references, already disambiguated, as a data frame (optionally, it should save the files in CSV or WOS)
 Explain what data is returned, already de-trended
 
 Now you just run the analysis to identify the peak years and references (Tukey HSD?)
