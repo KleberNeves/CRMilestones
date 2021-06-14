@@ -28,6 +28,8 @@ This package uses CRExplorer, which is free and available from https://andreas-t
 
 To use this package, you need a copy of CRExplorer. One is bundled in the package (version 1.9, downloaded in June/2021) and is the default option. If you want to use your own installation, you'll need to pass the path to the function calls below.
 
+In any case, CRExplorer is written in Java, so you need to install Java as well. Download it from here (Oracle) or here (OpenJDK).
+
 ### Optogenetics
 
 Example data, maybe redo the search from their paper?
@@ -41,25 +43,28 @@ It returns the graph data, absolute and already de-trended (see ...). It also re
 
 If you want the graphs, you can plot them:
 ```{r}
-plot_rpys(CR_data)
+plot_rpys(CR_data, cited_year_range = c(1950, 2006))
 ```
 
 ```{r}
-plot_multi_rpys(CR_data)
+plot_multi_rpys(CR_data, cited_year_range = c(1950, 2006))
 ```
 
-
-Now you just run the analysis to identify the peak years and references (Tukey HSD?)
+Now you just run the analysis to identify the peak years and top references within each year. This is done by a simple algorithm, running a RPYS analysis for each year in separate, de-trending then ranking the data and afterwards considering peaks those years that consistently rank higher.
 ```{r}
-milestones = identify_milestones(CR_data, n_milestones = 10, n_refs = 1)
+milestones = identify_milestones(CR_data, n_milestones = 10, n_refs = 1,
+                                 cited_year_range = c(1950, 2006))
 ```
 
-Returns then a list of milestone references, the list of peak years and the RPYS plot, but indicating peaks with vertical lines and it's done.
-```{r}
-head(milestones$pubs)
-```
+The result is a list containing (1) a dataframe of the milestone references, (2) the list of peak years and (3) a multi-RPYS plot indicating the peaks with vertical lines.
 
 ```{r}
-milestones$graph
+milestones$rpys
 ```
+
+```{r}
+milestones$pubs$Reference_Cited
+```
+
+
 
