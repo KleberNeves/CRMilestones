@@ -27,18 +27,19 @@ First of all, you should install it. If you haven't, run the code below and foll
 install_CRE()
 ```
 
-Once installed, you'll need to tell the functions where to find it (alternatively, add it to your .RProfile)
+Once installed, you'll need to tell the functions where to find it (alternatively, add it to your .RProfile):
 ```{r}
 CREXPLORER_PATH = "..."
 ```
 
 Example data, maybe redo the search from their paper?
+Below it's run with default arguments, but you can change them.
 ```{r}
-CR_data = run_CRE(data_path = "...", cre_path = CREXPLORER_PATH,
-                  other_args_to_pass_to_CRExplorer)
+wos_records = system.file("extdata", "optogenetics.txt", package = "CRMilestones", mustWork = T)
+CR_data = run_CRE(data_files = wos_records, cre_path = CREXPLORER_PATH)
 ```
 
-It returns the graph CSV, as a data frame and the list of references, already disambiguated, as a data frame (optionally, it should save the files in CSV or WOS)
+It returns the graph CSV, as a data frame and the list of references, already disambiguated, as a data frame (optionally, it should save the files in CSV or WOS) and the RPYS plot (like the one in the software)
 Explain what data is returned, already de-trended
 
 Now you just run the analysis to identify the peak years and references (Tukey HSD?)
@@ -46,7 +47,7 @@ Now you just run the analysis to identify the peak years and references (Tukey H
 milestones = identify_milestones(CR_data, n_milestones = 10, n_refs = 1)
 ```
 
-Returns then a list of references, the list of peak years, the RPYS plots (like the one in the software, but indicating peaks with arrows?) and it's done.
+Returns then a list of milestone references, the list of peak years and the RPYS plot, but indicating peaks with vertical lines and it's done.
 ```{r}
 head(milestones$pubs)
 ```
