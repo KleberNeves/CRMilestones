@@ -104,6 +104,19 @@ run_CRE <- function (
 
 identify_milestones <- function (CR_data, n_milestones = 10, n_refs = 1) {
 
+  df = CR_data$references %>%
+    count(Year_Citing, Year_Cited) %>%
+    group_by(Year_Citing) %>%
+    mutate(
+      dt = detrend(n),
+      r = rank(dt, ties.method = "min"),
+      r = 100 + r - max(r)
+    )
+
+  # ANOVA to test for differences in years
+
+
+  # Post test to identify specific years
 
   list(pubs = pubs, peak_years = peak_years, graph = graph)
 }
