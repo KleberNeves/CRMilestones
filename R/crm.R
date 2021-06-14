@@ -110,21 +110,24 @@ identify_milestones <- function (CR_data, n_milestones = 10, n_refs = 1) {
 
 plot_rpys <- function (CR_data, cited_year_range = NULL) {
 
-  df = CR_data$graph_data %>%
-    pivot_longer(cols = -Year)
+  df = CR_data$references %>%
+    count(Year_Cited) %>%
+    rename(`# References` = n) %>%
+    mutate(`Deviation from 5-yr Median` = detrend(`# References`)) %>%
+    pivot_longer(-Year_Cited)
 
   if (is.null(cited_year_range)) {
-    max_py = min(max(df$Year), lubridate::year(lubridate::now()))
+    max_py = min(max(df$Year_Cited), lubridate::year(lubridate::now()))
     cited_year_range = c(1900, max_py)
   }
 
   p = ggplot(df) +
-    aes(x = Year, y = value, color = name) +
+    aes(x = Year_Cited, y = value, color = name) +
     geom_line() +
     xlim(cited_year_range) +
     theme_minimal() +
     theme(legend.position = "bottom") +
-    labs(x = "", y = "# References", color = "")
+    labs(x = "", y = "# Cited References", color = "")
 
   p
 }
@@ -132,25 +135,28 @@ plot_rpys <- function (CR_data, cited_year_range = NULL) {
 plot_multi_rpys <- function (CR_data, cited_year_range = NULL) {
 
   df = CR_data$references %>%
-    count(Year_Citing, Year_Cited)
+    count(Year_Citing, Year_Cited) %>%
+    group_by(Year_Citing) %>%
+    mutate(
+      dt = detrend(n),
+      r = rank(dt, ties.method = "min"),
+      r = 100 + r - max(r)
+    )
 
   if (is.null(cited_year_range)) {
     max_py = min(max(df$Year_Cited), lubridate::year(lubridate::now()))
     cited_year_range = c(1900, max_py)
   }
 
-  color_midpoint = quantile(df$n, 0.8, na.rm = T)
-
   p = ggplot(df) +
-    aes(x = Year_Cited, y = Year_Citing, fill = n) +
+    aes(x = Year_Cited, y = Year_Citing, fill = r) +
     geom_tile() +
-    scale_fill_gradient2(low = "#dfedf2", mid = "#67c2a1", high = "#00691c",
-                         midpoint = color_midpoint) +
+    scale_fill_gradient2(low = "#edf2df", mid = "#70ba9e", high = "#0b006e", midpoint = 50) +
     scale_x_continuous(limits = cited_year_range, breaks = scales::pretty_breaks()) +
     scale_y_reverse() +
     theme_minimal() +
     theme(legend.position = "bottom", panel.grid = element_blank()) +
-    labs(x = "Cited References", y = "Citing Documents", color = "")
+    labs(x = "Cited References", y = "Citing Documents", fill = "Ranked Absolute Deviation")
 
   p
 }
