@@ -84,18 +84,32 @@ run_CRE <- function (
     select(-AVG) %>%
     `colnames<-`(c("Year", "# Cited References", "Deviation from 5-year median"))
 
-  data_cited = read_csv(fn_cited, col_types = cols()) %>%
-    select(ID, CR, N_CR, AU, RPY, J_N, DOI) %>%
-    `colnames<-`(c("ID", "Reference", "Times Cited", "Author", "Year", "Journal", "DOI"))
+  data_cited = suppressWarnings(suppressMessages(
+    read_csv(fn_cited, col_types = cols(), na = c("", "null"))
+  )) %>%
+    select(ID, TI, PY, SO, AU, DI, ID_1, CR, RPY, N_CR, DOI) %>%
+    `colnames<-`(c("ID_Citing", "Title_Citing", "Year_Citing", "Journal_Citing",
+                   "Author_Citing", "DOI_Citingr", "ID_Cited", "Reference_Cited",
+                   "Year_Cited", "Times_Cited", "DOI_Cited"))
 
   # save files if desired
   if (!is.null(save_files)) {
     write_tsv(data_graph, file.path(save_files, "CRE_data_graph.tsv"))
-    write_tsv(data_cited, file.path(save_files, "CRE_data_cited_refs.tsv"))
+    write_tsv(data_cited, file.path(save_files, "CRE_cited_citing_refs.tsv"))
   }
 
-  # make rpys graph
-  df = data_graph %>%
+  # return data frames
+  list(references = data_cited, graph_data = data_graph)
+}
+
+identify_milestones <- function (CR_data, n_milestones = 10, n_refs = 1) {
+
+
+  list(pubs = pubs, peak_years = peak_years, graph = graph)
+}
+
+plot_rpys <- function (CR_data) {
+  df = CR_data$graph_data %>%
     pivot_longer(cols = -Year)
 
   p = ggplot(df) +
@@ -105,12 +119,9 @@ run_CRE <- function (
     theme(legend.position = "bottom") +
     labs(x = "", y = "# References", color = "")
 
-  # return data frames
-  list(rpys_graph = p, rpys_data = data_graph, references = data_cited)
+  p
 }
 
-identify_milestones <- function (CR_data, n_milestones = 10, n_refs = 1) {
+plot_multi_rpys <- function () {
 
-
-  list(pubs = pubs, peak_years = peak_years, graph = graph)
 }
