@@ -18,25 +18,23 @@ knitr::opts_chunk$set(
 library(CRMilestones)
 ```
 
+### Motivation
+
 Intro text, motivation, context, links to references.
 
-This package uses CRExplorer, which is free and available from ... . Credits, link to references, manual
+### CRExplorer
 
-First of all, you should install it. If you haven't, run the code below and follow the instructions:
-```{r, eval=FALSE}
-install_CRE()
-```
+This package uses CRExplorer, which is free and available from https://andreas-thor.github.io/cre/. A manual to the software can be found here: https://andreas-thor.github.io/cre/manual.pdf.
 
-Once installed, you'll need to tell the functions where to find it (alternatively, add it to your .RProfile):
-```{r}
-CREXPLORER_PATH = "..."
-```
+To use this package, you need a copy of CRExplorer. One is bundled in the package (version 1.9, downloaded in June/2021) and is the default option. If you want to use your own installation, you'll need to pass the path to the function calls below.
+
+### Optogenetics
 
 Example data, maybe redo the search from their paper?
 Below it's run with default arguments, but you can change them.
 ```{r}
 wos_records = system.file("extdata", "optogenetics.txt", package = "CRMilestones", mustWork = T)
-CR_data = run_CRE(data_files = wos_records, cre_path = CREXPLORER_PATH)
+CR_data = run_CRE(data_files = wos_records)
 ```
 
 It returns the graph CSV, as a data frame and the list of references, already disambiguated, as a data frame (optionally, it should save the files in CSV or WOS) and the RPYS plot (like the one in the software)

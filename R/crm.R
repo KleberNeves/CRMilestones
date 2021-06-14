@@ -22,7 +22,7 @@
 run_CRE <- function (
   data_files = NULL,
   data_path = NULL,
-  cre_path = CREXPLORER_PATH,
+  cre_path = NULL,
   type = "WOS",
   cited_year_range = c(0, 2100),
   include_cited_wo_year = T,
@@ -35,8 +35,10 @@ run_CRE <- function (
 ) {
 
   # check CRE installation
-  if (!file.exists(cre_path)) {
-    stop(paste0("CRExplorer installation not found at ", cre_path, ".\n If you need to install it, run install_CRE() for help."))
+  if (is.null(cre_path)) {
+    cre_path = system.file("java", "CitedReferencesExplorerScript.jar", package = "CRMilestones", mustWork = T)
+  } else if (!file.exists(cre_path)) {
+    stop(paste0("CRExplorer installation not found at ", cre_path, ".\n If you need to install it, go to https://andreas-thor.github.io/cre/."))
   }
 
   # make string for list of input files
@@ -111,10 +113,4 @@ identify_milestones <- function (CR_data, n_milestones = 10, n_refs = 1) {
 
 
   list(pubs = pubs, peak_years = peak_years, graph = graph)
-}
-
-install_CRE <- function () {
-
-  # shows clickable download link and brief instructions to set the path, recommends vignette
-
 }
