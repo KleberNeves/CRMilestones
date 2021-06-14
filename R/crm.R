@@ -102,9 +102,17 @@ run_CRE <- function (
   list(references = data_cited, graph_data = data_graph)
 }
 
-identify_milestones <- function (CR_data, n_milestones = 10, n_refs = 1) {
+identify_milestones <- function (CR_data, n_milestones = 10, n_refs = 1, min_times_cited = 2, cited_year_range = NULL) {
 
+  if (is.null(cited_year_range)) {
+    max_py = min(max(CR_data$references$Year_Cited),
+                 lubridate::year(lubridate::now()))
+    cited_year_range = c(1900, max_py)
+  }
+
+  # Find peak years
   df = CR_data$references %>%
+    filter(Times_Cited >= min_times_cited) %>%
     count(Year_Citing, Year_Cited) %>%
     group_by(Year_Citing) %>%
     mutate(
@@ -113,12 +121,34 @@ identify_milestones <- function (CR_data, n_milestones = 10, n_refs = 1) {
       r = 100 + r - max(r)
     )
 
-  # ANOVA to test for differences in years
+  dfs = df %>% group_by(Year_Cited) %>%
+    summarise(M = mean(r), SE = sd(r) / n(), D = M / SE)
 
+  peaks = dfs %>% slice_max(order_by = M, n = n_milestones) %>% pull(Year_Cited)
 
-  # Post test to identify specific years
+  df = df %>% mutate(Peak = Year_Cited %in% peaks)
 
-  list(pubs = pubs, peak_years = peak_years, graph = graph)
+  p1 = plot_multi_rpys(CR_data, cited_year_range = cited_year_range) +
+    geom_vline(xintercept = peaks - 0.5, size = 1, alpha = 0.4, color = "red") +
+    geom_vline(xintercept = peaks + 0.5, size = 1, alpha = 0.4, color = "red") +
+    theme(legend.position = "none")
+
+  p2 = plot_rpys(CR_data, cited_year_range = cited_year_range) +
+    geom_vline(xintercept = peaks - 0.5, size = 1, alpha = 0.4, color = "red") +
+    geom_vline(xintercept = peaks + 0.5, size = 1, alpha = 0.4, color = "red")
+
+  p = cowplot::plot_grid(plotlist = list(p1, p2),
+                         ncol = 1, align = "h", axis = "tblr")
+
+  # Find top references of each peak year
+  df = CR_data$references %>%
+    filter(Year_Cited %in% peaks) %>%
+    group_by(Year_Cited) %>%
+    distinct(ID_Cited, .keep_all = T) %>%
+    slice_max(order_by = Times_Cited, n = n_refs) %>%
+    select(ID_Cited, Reference_Cited, Year_Cited, Times_Cited, DOI_Cited)
+
+  list(pubs = df, rpys = p1, rpys_stacked = p, peak_years = peaks)
 }
 
 plot_rpys <- function (CR_data, cited_year_range = NULL) {
@@ -158,14 +188,14 @@ plot_multi_rpys <- function (CR_data, cited_year_range = NULL) {
 
   if (is.null(cited_year_range)) {
     max_py = min(max(df$Year_Cited), lubridate::year(lubridate::now()))
-    cited_year_range = c(1900, max_py)
+    cited_year_range = c(1950, max_py)
   }
 
   p = ggplot(df) +
     aes(x = Year_Cited, y = Year_Citing, fill = r) +
     geom_tile() +
-    scale_fill_gradient2(low = "#edf2df", mid = "#70ba9e", high = "#0b006e", midpoint = 50) +
-    scale_x_continuous(limits = cited_year_range, breaks = scales::pretty_breaks()) +
+    scale_fill_gradient2(low = "#f2f0df", mid = "#98db81", high = "#08004f", midpoint = 60) +
+    scale_x_continuous(limits = cited_year_range, breaks = scales::pretty_breaks(n = 8)) +
     scale_y_reverse() +
     theme_minimal() +
     theme(legend.position = "bottom", panel.grid = element_blank()) +
