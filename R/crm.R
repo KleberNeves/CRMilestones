@@ -147,9 +147,21 @@ plot_multi_rpys <- function (CR_data, cited_year_range = NULL) {
     scale_fill_gradient2(low = "#dfedf2", mid = "#67c2a1", high = "#00691c",
                          midpoint = color_midpoint) +
     scale_x_continuous(limits = cited_year_range, breaks = scales::pretty_breaks()) +
+    scale_y_reverse() +
     theme_minimal() +
     theme(legend.position = "bottom", panel.grid = element_blank()) +
     labs(x = "Cited References", y = "Citing Documents", color = "")
 
   p
+}
+
+detrend <- function (x, window_size = 5) {
+  half_size = floor((window_size - 1) / 2)
+  m = numeric(length(x))
+  for (i in 1:length(x)) {
+    lower_i = max(1, i - half_size)
+    upper_i = min(length(x), i + half_size)
+    m[i] = median(x[lower_i:upper_i])
+  }
+  x - m
 }
