@@ -37,8 +37,17 @@ wos_records = system.file("extdata", "optogenetics.txt", package = "CRMilestones
 CR_data = run_CRE(data_files = wos_records)
 ```
 
-It returns the graph CSV, as a data frame and the list of references, already disambiguated, as a data frame (optionally, it should save the files in CSV or WOS) and the RPYS plot (like the one in the software)
-Explain what data is returned, already de-trended
+It returns the graph data, absolute and already de-trended (see ...). It also returns the data frame with the list of references, already disambiguated (optionally, it should save the files in CSV or WOS) and the RPYS plot (like the one in the software).
+
+If you want the graphs, you can plot them:
+```{r}
+plot_rpys(CR_data)
+```
+
+```{r}
+plot_multi_rpys(CR_data)
+```
+
 
 Now you just run the analysis to identify the peak years and references (Tukey HSD?)
 ```{r}

@@ -108,13 +108,20 @@ identify_milestones <- function (CR_data, n_milestones = 10, n_refs = 1) {
   list(pubs = pubs, peak_years = peak_years, graph = graph)
 }
 
-plot_rpys <- function (CR_data) {
+plot_rpys <- function (CR_data, cited_year_range = NULL) {
+
   df = CR_data$graph_data %>%
     pivot_longer(cols = -Year)
+
+  if (is.null(cited_year_range)) {
+    max_py = min(max(df$Year), lubridate::year(lubridate::now()))
+    cited_year_range = c(1900, max_py)
+  }
 
   p = ggplot(df) +
     aes(x = Year, y = value, color = name) +
     geom_line() +
+    xlim(cited_year_range) +
     theme_minimal() +
     theme(legend.position = "bottom") +
     labs(x = "", y = "# References", color = "")
@@ -122,6 +129,27 @@ plot_rpys <- function (CR_data) {
   p
 }
 
-plot_multi_rpys <- function () {
+plot_multi_rpys <- function (CR_data, cited_year_range = NULL) {
 
+  df = CR_data$references %>%
+    count(Year_Citing, Year_Cited)
+
+  if (is.null(cited_year_range)) {
+    max_py = min(max(df$Year_Cited), lubridate::year(lubridate::now()))
+    cited_year_range = c(1900, max_py)
+  }
+
+  color_midpoint = quantile(df$n, 0.8, na.rm = T)
+
+  p = ggplot(df) +
+    aes(x = Year_Cited, y = Year_Citing, fill = n) +
+    geom_tile() +
+    scale_fill_gradient2(low = "#dfedf2", mid = "#67c2a1", high = "#00691c",
+                         midpoint = color_midpoint) +
+    scale_x_continuous(limits = cited_year_range, breaks = scales::pretty_breaks()) +
+    theme_minimal() +
+    theme(legend.position = "bottom", panel.grid = element_blank()) +
+    labs(x = "Cited References", y = "Citing Documents", color = "")
+
+  p
 }
