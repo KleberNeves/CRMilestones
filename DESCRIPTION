@@ -16,6 +16,14 @@ Suggests:
     knitr,
     rmarkdown
 Imports:
-    magrittr
+    magrittr,
+    cowplot,
+    dplyr,
+    ggplot2,
+    lubridate,
+    readr,
+    scales,
+    stringr,
+    tidyr
 VignetteBuilder: knitr
 RoxygenNote: 7.0.2
