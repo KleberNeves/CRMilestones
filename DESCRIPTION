@@ -15,5 +15,7 @@ SystemRequirements: Java 8+
 Suggests: 
     knitr,
     rmarkdown
+Imports:
+    magrittr
 VignetteBuilder: knitr
 RoxygenNote: 7.0.2
