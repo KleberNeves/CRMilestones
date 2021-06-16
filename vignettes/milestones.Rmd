@@ -18,53 +18,74 @@ knitr::opts_chunk$set(
 library(CRMilestones)
 ```
 
-### Motivation
+This package is a helper to identify historical milestones in a citation dataset using RPYS (Reference Publication Year Spectroscopy), essentially implementing the method described in Comins & Leydesdorff (2017).
 
-Intro text, motivation, context, links to references.
+### Requirement: CRExplorer
 
-### CRExplorer
+This package uses CRExplorer, which is free and available from <https://andreas-thor.github.io/cre/>. A manual to the software can be found here: <https://andreas-thor.github.io/cre/manual.pdf>.
 
-This package uses CRExplorer, which is free and available from https://andreas-thor.github.io/cre/. A manual to the software can be found here: https://andreas-thor.github.io/cre/manual.pdf.
+A copy of CRExplorer comes bundled in the package (version 1.9, downloaded in June/2021) and is the default option. If you want to use your own installation, you'll need to pass the path to the function calls below.
 
-To use this package, you need a copy of CRExplorer. One is bundled in the package (version 1.9, downloaded in June/2021) and is the default option. If you want to use your own installation, you'll need to pass the path to the function calls below.
+In addition, CRExplorer is written in Java, so you need to install it as well. Download it from here [Oracle](https://www.oracle.com/java/) or here [OpenJDK](https://openjdk.java.net/).
 
-In any case, CRExplorer is written in Java, so you need to install Java as well. Download it from here (Oracle) or here (OpenJDK).
+### Example: optogenetics
 
-### Optogenetics
+Optogenetics "is a biological technique that involves the use of light to control neurons that have been genetically modified to express light-sensitive ion channels" [from Wikipedia](https://en.wikipedia.org/wiki/Optogenetics). It has an interesting history, as it is a merger of two lines - one from cellular neuroscience, another originating with light-sensitive ion-channels that were discovered in green algae.
 
-Example data, maybe redo the search from their paper?
-Below it's run with default arguments, but you can change them.
+We start with a dataset of references. Here, the data for optogenetis was obtained by snowballing from the paper that established the method (Boyden ES, Zhang F, Bamberg E, Nagel G, Deisseroth K. 2005. "Millisecond-timescale, genetically targeted optical control of neural activity". Nature Neuroscience). These records, retrieved from Web of Science, are available with this package, as an example. The records contain the 2005 paper, the references cited by this paper and the references cited by those references (i.e. second generation citations).
+
+The function *run_CRE* is called below to do the first step. It will use CRExplorer to read the data and disambiguate the references. The result, stored in *CR_data*, will contain a data frame of references, indicating the *citing* ones (i.e. the ones included in the records provided) and the *cited* ones - the ones cited by those records. There might be overlap between the two sets, but which reference cites which will be specified by the data frame, where each row is a pair *citing -\> cited*
+
+Notice that this call is very verbose, as it reproduces the console output of CRExplorer. It takes a few moments to run (more depending on the size of the records).
+
 ```{r}
 wos_records = system.file("extdata", "optogenetics.txt", package = "CRMilestones", mustWork = T)
 CR_data = run_CRE(data_files = wos_records)
 ```
 
-It returns the graph data, absolute and already de-trended (see ...). It also returns the data frame with the list of references, already disambiguated (optionally, it should save the files in CSV or WOS) and the RPYS plot (like the one in the software).
+Now CR_data is what you use for the other functions. First, you can plot graphs. For single RPYS:
 
-If you want the graphs, you can plot them:
 ```{r}
 plot_rpys(CR_data, cited_year_range = c(1950, 2006))
 ```
+
+For multiple RPYS (the visualization is not straightforward, see the documentation for the function and the references therein):
 
 ```{r}
 plot_multi_rpys(CR_data, cited_year_range = c(1950, 2006))
 ```
 
-Now you just run the analysis to identify the peak years and top references within each year. This is done by a simple algorithm, running a RPYS analysis for each year in separate, de-trending then ranking the data and afterwards considering peaks those years that consistently rank higher.
+The other thing (which motivates this package) is to identify the milestone references and years. This is achieved through the *identify_milestones* function. This is done by a simple algorithm, running a RPYS analysis for each year in separate, de-trending then ranking the data and afterwards considering peaks those years that consistently rank higher. Again, for more details, see the documentation and the references cited above.
+
 ```{r}
 milestones = identify_milestones(CR_data, n_milestones = 10, n_refs = 1,
                                  cited_year_range = c(1950, 2006))
 ```
 
-The result is a list containing (1) a dataframe of the milestone references, (2) the list of peak years and (3) a multi-RPYS plot indicating the peaks with vertical lines.
+The result is a list containing (1) a dataframe of the milestone references, (2) the list of peak years and (3) plots indicating the peak years with vertical lines.
 
+
+Options of plots:
 ```{r}
 milestones$rpys
+```
+
+```{r}
+milestones$rpys_stacked
+```
+
+The list of milestone years and references:
+
+```{r}
+milestones$peak_years
 ```
 
 ```{r}
 milestones$pubs$Reference_Cited
 ```
 
+### References
 
+Comins & Hussey (2015). Compressing multiple scales of impact detection by Reference Publication Year Spectroscopy. *Journal of Informetrics*. DOI:10.1016/j.joi.2015.03.003
 
+Comins & Leydesdorff (2017). Citation algorithms for identifying research milestones driving biomedical innovation. *Scientometrics.* DOI:10.1007/s11192-016-223
