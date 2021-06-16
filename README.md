@@ -14,5 +14,5 @@ devtools::install_github("KleberNeves/CRMilestones")
 
 To see an example, see the vignette with:
 ``` r
-vignette("milestones", package = "CRMilestones)
+vignette("milestones", package = "CRMilestones")
 ```
