@@ -11,6 +11,7 @@ Description: This package contains a lot of functions to help in running methods
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+SystemRequirements: Java 8+
 Suggests: 
     knitr,
     rmarkdown
