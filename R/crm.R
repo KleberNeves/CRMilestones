@@ -1,6 +1,11 @@
-#' Calls CRExplorer
+#' Process and disambiguate references using CRExplorer
 #'
-#' For more details, see the documentation for CRExplorer at
+#' *data_files* or *data_path* serve to specify the files to be read and
+#' *save_files* indicate whether to save the output to disk. The rest of
+#' the arguments are passed to CRExplorer.
+#'
+#' For more details about how the arguments are used, see the documentation
+#' for CRExplorer at https://andreas-thor.github.io/cre/manual.pdf
 #'
 #' @param data_files A character vector with a list of filenames. If provided, data_path must be NULL.
 #' @param data_path A character vector with a directory. If provided, data_files must be NULL.
@@ -15,10 +20,8 @@
 #' @param import_max Maximum number of references to import. Defaults to 10,000.
 #' @param save_files If NULL (default), the data will not be saved to disk. If you provide a path, it will save the results to the given folder.
 #'
-#' @return
+#' @return A list containing two data frames, one with the references (citing and cited) and one with the data underlying the RPYS graph
 #' @export
-#'
-#' @examples
 run_CRE <- function (
   data_files = NULL,
   data_path = NULL,
@@ -102,13 +105,31 @@ run_CRE <- function (
   list(references = data_cited, graph_data = data_graph)
 }
 
+
+#' Identify milestone years and papers
+#'
+#' Given a data frame of cited references, it runs a multi-RPYS analysis
+#' to find the milestones. Details of the algorithm can be found in the
+#' following references:
+#'
+#' Comins & Hussey (2015). Compressing multiple scales of impact detection by Reference Publication Year Spectroscopy. Journal of Informetrics. DOI:10.1016/j.joi.2015.03.003
+#' Comins & Leydesdorff (2017). Citation algorithms for identifying research milestones driving biomedical innovation. Scientometrics. DOI:10.1007/s11192-016-2238-1
+#'
+#' @param CR_data A list containing the bibliometric data frame, as returned by *run_CRE()*
+#' @param n_milestones How many milestone years will be selected (default is 10).
+#' @param n_refs How many references from each year will be selected (default is 1).
+#' @param min_times_cited References cited strictly less than this argument will be excluded from the analysis (default is 2)
+#' @param cited_year_range Passed to the plotting function (the analysis will take up the full range)
+#'
+#' @return A list containing a data frame with the milestone papers, a vector of the milestone years and two options of RPYS figures (ggplot objects)
+#' @export
 identify_milestones <- function (CR_data, n_milestones = 10, n_refs = 1, min_times_cited = 2, cited_year_range = NULL) {
 
-  if (is.null(cited_year_range)) {
-    max_py = min(max(CR_data$references$Year_Cited),
-                 lubridate::year(lubridate::now()))
-    cited_year_range = c(1900, max_py)
-  }
+  # if (is.null(cited_year_range)) {
+  #   max_py = min(max(CR_data$references$Year_Cited),
+  #                lubridate::year(lubridate::now()))
+  #   cited_year_range = c(1900, max_py)
+  # }
 
   # Find peak years
   df = CR_data$references %>%
@@ -151,6 +172,18 @@ identify_milestones <- function (CR_data, n_milestones = 10, n_refs = 1, min_tim
   list(pubs = df, rpys = p1, rpys_stacked = p, peak_years = peaks)
 }
 
+
+
+#' Plots a single RPYS plot
+#'
+#' The plot shows the frequency of cited references (CR) in each year, as well as
+#' the detrended value (#CR - median of the #CR of 5 years around (±2)).
+#'
+#' @param CR_data A list containing the bibliometric data frame, as returned by *run_CRE()*
+#' @param cited_year_range The range of years to plot. Default is NULL, which the function transforms to "from 1900 to the most recent year in the dataset".
+#'
+#' @return A ggplot.
+#' @export
 plot_rpys <- function (CR_data, cited_year_range = NULL) {
 
   df = CR_data$references %>%
@@ -175,6 +208,18 @@ plot_rpys <- function (CR_data, cited_year_range = NULL) {
   p
 }
 
+
+#' Plots a multi-RPYS plot
+#'
+#' The plot shows a matrix where the rows indicate the citing year and columns the cited year. The color indicates the frequency of the cited year for that citing year (i.e. colors are relative to each row). However, to be comparable across citing years, the color indicates the ranking, not the absolute values of the deviations from the median of the 5-years around it.
+#'
+#' In other words, a simple RPYS analysis is done for each citing year, the de-trended data is calculated (i.e. deviation from the local median) and the de-trended data is then ranked. This is the same procedure followed for identifying milestones.
+#'
+#' @param CR_data A list containing the bibliometric data frame, as returned by *run_CRE()*
+#' @param cited_year_range The range of years to plot. Default is NULL, which the function transforms to "from 1900 to the most recent year in the dataset".
+#'
+#' @return A ggplot.
+#' @export
 plot_multi_rpys <- function (CR_data, cited_year_range = NULL) {
 
   df = CR_data$references %>%
@@ -204,6 +249,15 @@ plot_multi_rpys <- function (CR_data, cited_year_range = NULL) {
   p
 }
 
+#' De-trends a numeric vector
+#'
+#' Given a numeric vector, it calculates a rolling median and then from each element, it subtracts the local median. The window for the median is centered on the element, so if the size is 5, it takes the element itself and the elements up to ±2 positions from it. If the size is even, it's rounded down (e.g. window_size = 6 is the same as window_size = 5).
+#'
+#' @param x A numeric vector.
+#' @param window_size A length for the rolling window to calculate the median.
+#'
+#' @return A numeric vector, de-trended.
+#' @export
 detrend <- function (x, window_size = 5) {
   half_size = floor((window_size - 1) / 2)
   m = numeric(length(x))
