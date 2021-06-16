@@ -26,13 +26,13 @@ This package uses CRExplorer, which is free and available from <https://andreas-
 
 A copy of CRExplorer comes bundled in the package (version 1.9, downloaded in June/2021) and is the default option. If you want to use your own installation, you'll need to pass the path to the function calls below.
 
-In addition, CRExplorer is written in Java, so you need to install it as well. Download it from here [Oracle](https://www.oracle.com/java/) or here [OpenJDK](https://openjdk.java.net/).
+In addition, CRExplorer is written in Java, so you need to install it as well. Download it [here (Oracle)](https://www.oracle.com/java/) or [here (OpenJDK)](https://openjdk.java.net/).
 
 ### Example: optogenetics
 
 Optogenetics "is a biological technique that involves the use of light to control neurons that have been genetically modified to express light-sensitive ion channels" [from Wikipedia](https://en.wikipedia.org/wiki/Optogenetics). It has an interesting history, as it is a merger of two lines - one from cellular neuroscience, another originating with light-sensitive ion-channels that were discovered in green algae.
 
-We start with a dataset of references. Here, the data for optogenetis was obtained by snowballing from the paper that established the method (Boyden ES, Zhang F, Bamberg E, Nagel G, Deisseroth K. 2005. "Millisecond-timescale, genetically targeted optical control of neural activity". Nature Neuroscience). These records, retrieved from Web of Science, are available with this package, as an example. The records contain the 2005 paper, the references cited by this paper and the references cited by those references (i.e. second generation citations).
+We start with a dataset of references. Here, the data for optogenetis was obtained by snowballing from the paper that established the method (Boyden et al. 2005). These records, retrieved from Web of Science, are available with this package, as an example. The records contain the 2005 paper, the references cited by this paper and the references cited by those references (i.e. second generation citations).
 
 The function *run_CRE* is called below to do the first step. It will use CRExplorer to read the data and disambiguate the references. The result, stored in *CR_data*, will contain a data frame of references, indicating the *citing* ones (i.e. the ones included in the records provided) and the *cited* ones - the ones cited by those records. There might be overlap between the two sets, but which reference cites which will be specified by the data frame, where each row is a pair *citing -\> cited*
 
@@ -85,6 +85,8 @@ milestones$pubs$Reference_Cited
 ```
 
 ### References
+
+Boyden, Zhang, Bamberg, Nagel & Deisseroth (2005). Millisecond-timescale, genetically targeted optical control of neural activity. *Nature Neuroscience*. DOI:10.1038/nn1525
 
 Comins & Hussey (2015). Compressing multiple scales of impact detection by Reference Publication Year Spectroscopy. *Journal of Informetrics*. DOI:10.1016/j.joi.2015.03.003
 
