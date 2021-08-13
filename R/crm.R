@@ -95,7 +95,7 @@ run_CRE <- function (
   )) %>%
     dplyr::select(ID, TI, PY, SO, AU, DI, ID_1, CR, RPY, N_CR, DOI) %>%
     `colnames<-`(c("ID_Citing", "Title_Citing", "Year_Citing", "Journal_Citing",
-                   "Author_Citing", "DOI_Citingr", "ID_Cited", "Reference_Cited",
+                   "Author_Citing", "DOI_Citing", "ID_Cited", "Reference_Cited",
                    "Year_Cited", "Times_Cited", "DOI_Cited"))
 
   # save files if desired
