@@ -96,13 +96,13 @@ run_CRE <- function (
     dplyr::select(-AVG) %>%
     `colnames<-`(c("Year", "# Cited References", "Deviation from 5-year median"))
 
-  data_cited = suppressWarnings(suppressMessages(
-    readr::read_csv(fn_cited, col_types = readr::cols(), na = c("", "null"))
-  )) %>%
-    dplyr::select(ID, TI, PY, SO, AU, DI, ID_1, CR, RPY, N_CR, DOI) %>%
-    `colnames<-`(c("ID_Citing", "Title_Citing", "Year_Citing", "Journal_Citing",
-                   "Author_Citing", "DOI_Citing", "ID_Cited", "Reference_Cited",
-                   "Year_Cited", "Times_Cited", "DOI_Cited"))
+  data_cited = suppressWarnings(suppressMessages(readr::read_csv(fn_cited, 
+                                                               col_types = readr::cols(), na = c("", "null")))) %>% 
+  dplyr::select(1, 8, 9, 10, 3, 18, 25, 26, 27, 
+                28, 41) %>% `colnames<-`(c("ID_Citing", "Title_Citing", 
+                                              "Year_Citing", "Journal_Citing", "Author_Citing", "DOI_Citing", 
+                                              "ID_Cited", "Reference_Cited", "Year_Cited", "Times_Cited", 
+                                              "DOI_Cited"))
 
   # save files if desired
   if (!is.null(save_files)) {
