@@ -82,7 +82,13 @@ run_CRE <- function (
   readr::write_lines(cre_script, file = crs_file)
 
   # run external call
-  jar_call = sprintf('java -jar "%s" "%s"', cre_path, crs_file)
+  if (Sys.info()[1] == "Windows") {
+	  jar_call = sprintf("\"%s\" -jar \"%s\" \"%s\"", JAVA_PATH, cre_path, crs_file) %>%
+      stringr::str_replace_all("/","\\\\")
+  } else {
+	  jar_call = sprintf("java -jar \"%s\" \"%s\"", cre_path, crs_file)
+  }
+
   system(jar_call)
 
   # read files
