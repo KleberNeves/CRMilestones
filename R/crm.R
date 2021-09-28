@@ -57,8 +57,8 @@ run_CRE <- function (
   files_list_str = paste0('"', paste(files_list, collapse = '", "'), '"')
 
   # define export paths
-  fn_graph = file.path(tempdir(), "graph.csv")
-  fn_cited = file.path(tempdir(), "cited.csv")
+  fn_graph = file.path(normalizePath(tempdir(), winslash = "/"), "graph.csv")
+  fn_cited = file.path(normalizePath(tempdir(), winslash = "/"), "cited.csv")
 
   # prepare CRE script and run it
   cre_script = CRM_base_CRE_jar_script_string %>%
