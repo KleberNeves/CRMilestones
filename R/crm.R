@@ -78,8 +78,8 @@ run_CRE <- function (
     stringr::str_replace("_EXPORT_GRAPH_", fn_graph) %>%
     stringr::str_replace("_EXPORT_CITED_", fn_cited)
 
-  crs_file = file.path(tempdir(), "script.crs")
-  readr::write_lines(cre_script, path = crs_file)
+  crs_file = file.path(normalizePath(tempdir(), winslash = "/"), "script.crs")
+  readr::write_lines(cre_script, file = crs_file)
 
   # run external call
   jar_call = sprintf('java -jar "%s" "%s"', cre_path, crs_file)
@@ -100,8 +100,8 @@ run_CRE <- function (
 
   # save files if desired
   if (!is.null(save_files)) {
-    readr::write_tsv(data_graph, file.path(save_files, "CRE_data_graph.tsv"))
-    readr::write_tsv(data_cited, file.path(save_files, "CRE_cited_citing_refs.tsv"))
+    readr::write_tsv(data_graph, file.path(normalizePath(save_files, winslash = "/"), "CRE_data_graph.tsv"))
+    readr::write_tsv(data_cited, file.path(normalizePath(save_files, winslash = "/"), "CRE_cited_citing_refs.tsv"))
   }
 
   # return data frames
