@@ -49,7 +49,7 @@ run_CRE <- function (
   if (!is.null(data_files) & is.null(data_path)) {
     files_list = data_files
   } else if (is.null(data_files) & !is.null(data_path)) {
-    files_list = list.files(data_files)
+    files_list = list.files(data_path)
   } else {
     stop("One of data_files or data_path must be NULL.")
   }
@@ -96,12 +96,12 @@ run_CRE <- function (
     dplyr::select(-AVG) %>%
     `colnames<-`(c("Year", "# Cited References", "Deviation from 5-year median"))
 
-  data_cited = suppressWarnings(suppressMessages(readr::read_csv(fn_cited, 
-                                                               col_types = readr::cols(), na = c("", "null")))) %>% 
-  dplyr::select(1, 8, 9, 10, 3, 18, 25, 26, 27, 
-                28, 41) %>% `colnames<-`(c("ID_Citing", "Title_Citing", 
-                                              "Year_Citing", "Journal_Citing", "Author_Citing", "DOI_Citing", 
-                                              "ID_Cited", "Reference_Cited", "Year_Cited", "Times_Cited", 
+  data_cited = suppressWarnings(suppressMessages(readr::read_csv(fn_cited,
+                                                               col_types = readr::cols(), na = c("", "null")))) %>%
+  dplyr::select(1, 8, 9, 10, 3, 18, 25, 26, 27,
+                28, 41) %>% `colnames<-`(c("ID_Citing", "Title_Citing",
+                                              "Year_Citing", "Journal_Citing", "Author_Citing", "DOI_Citing",
+                                              "ID_Cited", "Reference_Cited", "Year_Cited", "Times_Cited",
                                               "DOI_Cited"))
 
   # save files if desired
