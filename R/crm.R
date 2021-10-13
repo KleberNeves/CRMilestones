@@ -49,8 +49,11 @@ run_CRE <- function (
   if (!is.null(data_files) & is.null(data_path)) {
     files_list = data_files
   } else if (is.null(data_files) & !is.null(data_path)) {
-    files_list = paste0(data_path,
-                        "/", list.files(data_path))
+    if (Sys.info()[1] == "Windows") {
+      files_list = paste0(data_path, "\\", list.files(data_path))
+    } else {
+      files_list = paste0(data_path, "/", list.files(data_path))
+    }
   } else {
     stop("One of data_files or data_path must be NULL.")
   }
